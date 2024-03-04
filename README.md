@@ -1,5 +1,7 @@
 BALAGIU DARIAN
 
+Scopul si cerinta proiectului sunt descrise in fisierul "Load Balancer"
+
 Cerinta:
 Scopul acestei teme este implementarea unui sistem de planificare a task-urilor intr-un datacenter, folosind
 Java Threads. Sistemul va folosi diverse politici de planificare precum Round Robin, Shortest Queue, Size INterval Task Assignemnt, Least Work Left.
