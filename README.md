@@ -1,4 +1,4 @@
-# 🧠 Load Balancer Simulator
+# Load Balancer Simulator
 
 ## Overview
 
