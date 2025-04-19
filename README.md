@@ -1,32 +1,43 @@
-BALAGIU DARIAN
+# 🧠 Load Balancer Simulator
 
- Scopul si cerinta proiectului sunt descrise in fisierul "Load Balancer.pdf"
+## Overview
 
-Cerinta:
-Scopul acestei teme este implementarea unui sistem de planificare a task-urilor intr-un datacenter, folosind
-Java Threads. Sistemul va folosi diverse politici de planificare precum Round Robin, Shortest Queue, Size INterval Task Assignemnt, Least Work Left.
+This project implements a **multi-threaded task scheduling system** for a simulated datacenter, built in **Java**. The system distributes incoming tasks across multiple hosts based on different **load balancing policies**.
 
-MyDispatcher.java
-    In aceasta clasa am definit metoda addTask(Task task) mostenita din clasa parinte. Pentru sincronizarea
-generatoarelor de task-uri care lucreaza in paralel si pot apela simultan metoda addTask a dispatcher-ului (lucru care ar fi dus la forwarding-ul gresit al task-urilor catre noduri),
-am definit metoda folosind cuvantul cheie "synchronized", care face imposibil ca mai multe thread-uri sa acceseze zona critica in acelasi timp.
-    Cei 4 algoritmi de repartizare a task-urilor sunt implementati precum a fost specificat in enunt, dar am adaugat comentarii in cod pentru claritate.
+The core objective is to explore and compare how various scheduling strategies affect workload distribution and execution efficiency in a concurrent environment.
 
-MyHost.java
-    Problema pe care trebuie sa o rezolvam in cadrul acestei clase este urmatoarea:
-Metoda run() (pe care thread-ul corespunzator Host-ului o ruleaza ciclic pana la primirea semnalului de shutdown)
-si metoda addTask(Task task) din MyHost (care adauga task-uri in coada de asteptare si este apelata de catre thread-ul Dispatcher-ului)
-pot accesa & modifica coada de asteptare in acelasi timp, determinand aparitia unor race conditions.
+## Key Features
 
-    Solutia aleasa de mine la aceasta problema este crearea cozii de asteptare pe baza tipului de date prezentat in
-laboratorul 6: BlockingQueue, iar pentru usurinta adaugarii task-urilor in coada pe baza prioritatii lor,
-am extins implementarea la PriorityBlockingQueue.
+- **Multi-threaded architecture** using Java Threads
+- Four built-in scheduling policies:
+  - **Round Robin**
+  - **Shortest Queue**
+  - **Size Interval Task Assignment (SITA)**
+  - **Least Work Left**
+- Thread-safe task assignment and execution
+- Prioritized task queues using `PriorityBlockingQueue`
+- Safe concurrency handling via `synchronized` methods and `AtomicBoolean` flags
 
-    Am creat propriul comparator prin clasa MyTaskComparator definita la finalul fisierului.
-    Metoda run() ruleaza continuu, pana la primirea semnalului de shutdown() de la thread-ul principal ce ruleaza Main.
-Deoarece atat run() (prin thread-ul rulat de Host), cat si shutdown() (print thread-ul rulat de Main) acceseaza si modifica variabila booleaana running,
-aceasta a fost creata ca si variabila atomica.
+## Implementation Highlights
 
-    In metoda run(), task-ul curent (currentTask) va fi rulat pe thread pentru o cuanta de timp de minim 200ms, dupa care se vor face verificarile de finalizare
-si de preemptare ale task-ului, care pot duce la modificarile task-ului curent si a cozii de asteptare.
-Acest ciclu continua pana cand toata munca a fost terminata sau thread-ul primeste semnalul de shutdown().
+### `MyDispatcher.java`
+
+Handles task distribution to hosts using the selected policy. To ensure thread safety when multiple task generators operate in parallel, the `addTask(Task task)` method is synchronized, preventing race conditions during task forwarding.
+
+### `MyHost.java`
+
+Each host processes tasks from a local queue in its own thread. To manage concurrent access to this queue:
+- A **`PriorityBlockingQueue`** is used for thread-safe priority-based scheduling.
+- A custom comparator (`MyTaskComparator`) ensures tasks are ordered by priority.
+- The main execution loop runs tasks in time slices (minimum 200ms), checking for completion or preemption.
+- The host gracefully shuts down when signaled, using an `AtomicBoolean` flag to manage its running state.
+
+## Technologies Used
+
+- Java Concurrency (Threads, `synchronized`, `AtomicBoolean`)
+- Blocking Queues (`PriorityBlockingQueue`)
+- Object-Oriented Design
+
+---
+
+> 📄 For full requirements and context, see the [Load Balancer.pdf](./Load%20Balancer.pdf) file.
